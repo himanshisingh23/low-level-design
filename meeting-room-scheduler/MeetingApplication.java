@@ -9,7 +9,7 @@ Class Participant implements Observer {
     String mobile;
     Calendar calendar;
 
-    public Participant (String name, String email, String mobile, Calendar calendar){
+    public Participant (String name, String email, String mobile){
         this.name = name;/
         this.email = email;
         this.mobile = mobile;
@@ -53,11 +53,37 @@ class Meeting{
 }
 
 // MeetingRoom 
+class MeetingRoom {
+    String roomId;
+    Meeting meeting;
+    int capacity;
+    Calendar calendar;
+    Location location;
+
+    public MeetingRoom(String roomId, int capacity, Location location){
+        this.roomId = "\{roomId}_\{location.floorId}_\{location.buildingId}";
+        this.capacity = capacity;
+        this.location = location;
+        this.calendar = new Calendar();
+    }
+
+    public isAvailable(TimeSlot timeSlot){
+        return this.calendar.isAvailable(timeSlot);
+    }
+}
 
 // TimeSlot
 
 // Calendar
 
 // Location
+class Location{
+    int floorId;
+    int buildingId;
 
+    public Location (int floorId, int buildingId){
+        this.floorId = floorId;
+        this.buildingId = buildingId;
+    }
+}
 

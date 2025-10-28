@@ -144,10 +144,51 @@ class FirstComeFirstServeStrategy implements RoomSelectionStrategy {
 }
 
 // Meeting Room Controller
+class MeetingRoomController {
+    List<MeetingRoom> meetingRooms = new ArrayList<>();
 
+    public void addMeetingRoom (MeetingRoom meetingRoom){
+        this.meetingRooms.add(meetingRoom);
+    }
+
+    public List<MeetingRoom> getAvailableMeetingRooms (int startTime, int endTime, int numParticipants){
+        List<MeetingRoom> availableRooms = new ArrayList<>();
+        for(MeetingRoom meetingRoom : this.meetingRooms){
+            if(meetingRoom.capacity>=numParticipants && meetingRoom.isAvailable(new TimeSlot(startTime, endTime))){
+                availableRooms.add(meetingRoom);
+            }
+        }
+        return availableRooms;
+    }
+}
 
 // Meeting Scheduler
+class MeetingScheduler{
+    MeetingRoomController roomController;
+    RoomSelectionStrategy roomSelectionStrategy;
+    
+    public MeetingScheduler (MeetingRoomController roomController, RoomSelectionStrategy roomSelectionStrategy){
+        this.roomController = roomController;
+        this.roomSelectionStrategy = roomSelectionStrategy;
+    }
 
+    public void scheduleMeeting (String meetingId, String title, List<Participant> participants, TimeSlot timeSlot){
+        List<MeetingRoom> availableRooms = room/getAvailableMeetingRooms(timeSlot.startTime, time.endTime, participants.size());
+        MeetingRoom selectedRoom = roomSelectionStrategy.selectRoom(roomController.meetingRooms);
+
+        if(selectedRoom != null){
+            selectedRoom.meeting = new Meeting(meetingId, title, participants, timeSlot);
+            selectedRoom.calendar.addTimeSlot(timeSlot);
+            selectedRoom.meeting.notifyParticipant("Meeting scheduled in room \{selectedRoom.roomId}");
+            System.out.println("Meeting scheduled in room \{selectedRoom.roomId}");
+
+            return selectedRoom;
+        }else{
+            System.out.println("Meeting Room is not available for given timeslot and number of participants");
+            return null;
+        }
+    }
+}
 
 // MeetingApplication
 class MeetingApplication {
@@ -174,6 +215,4 @@ class MeetingApplication {
         MeetingScheduler scheduler = new MeetingScheduler(new FirstComeFirstServeStrategy(), roomController);
         scheduler.scheduleMeeting("M1", "Archiving Discussion", participants, new TimeSlot(2,3));
         scheduler.scheduleMeeting("M1", "Archiving Discussion", participants, new TimeSlot(3,4));
-        
-    }
 }

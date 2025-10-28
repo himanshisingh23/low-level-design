@@ -10,7 +10,7 @@ Class Participant implements Observer {
     Calendar calendar;
 
     public Participant (String name, String email, String mobile, Calendar calendar){
-        this.name = name;
+        this.name = name;/
         this.email = email;
         this.mobile = mobile;
         this.calendar = new Calendar();
@@ -23,8 +23,36 @@ Class Participant implements Observer {
 }
 
 // Meeting
+class Meeting{
+    String meetingId;
+    String title;
+    List<Participant> participants;
+    TimeSlot timeSlot;
 
-// MeetingRoom
+    public Meeting (String meetingId, String title, List<Participant> participants, TimeSlot timeSlot){
+        this.meetingId = meetingId;
+        this.title = title;
+        this.participants = participants;
+        this.timeSlot = timeSlot;
+    }
+
+    public addParticipant(Participant participant){
+        this.participants.add(participant);
+    }
+
+    public removeParticipant(Participant participant){
+        this.participants.remove(participant);        
+    }
+    
+    public notifyParticipant(String message){
+        for(Participant participant: participants){
+            participant.update(message);
+        }
+    }
+
+}
+
+// MeetingRoom 
 
 // TimeSlot
 

@@ -130,7 +130,18 @@ class Location{
 }
 
 // Room Selection Strategy
+interface RoomSelectionStrategy {
+    public MeetingRoom selectRoom (List<MeetingRoom> meetingRooms);
+}
 
+class FirstComeFirstServeStrategy implements RoomSelectionStrategy {
+    public MeetingRoom selectRoom (List<MeetingRoom> meetingRooms){
+        if(!meetingRooms.isEmpty()){
+            return meetingRooms.getFirst();
+        }
+        return null;
+    }
+}
 
 // Meeting Room Controller
 

@@ -1,9 +1,13 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 interface Observer{
     public void update (String message);
 }
 
 // Participant
-Class Participant implements Observer {
+class Participant implements Observer {
     String name;
     String email;
     String mobile;
@@ -18,7 +22,7 @@ Class Participant implements Observer {
 
     @Override
     public void update (String message){
-        System.out.println("Email sent to \{this.email}: \{this.message}.");
+        System.out.println("Email sent to" + this.email + message);
     }
 }
 
@@ -36,15 +40,15 @@ class Meeting{
         this.timeSlot = timeSlot;
     }
 
-    public addParticipant(Participant participant){
+    public void addParticipant(Participant participant){
         this.participants.add(participant);
     }
 
-    public removeParticipant(Participant participant){
+    public void removeParticipant(Participant participant){
         this.participants.remove(participant);        
     }
     
-    public notifyParticipant(String message){
+    public void notifyParticipant(String message){
         for(Participant participant: participants){
             participant.update(message);
         }
@@ -61,13 +65,13 @@ class MeetingRoom {
     Location location;
 
     public MeetingRoom(String roomId, int capacity, Location location){
-        this.roomId = "\{roomId}_\{location.floorId}_\{location.buildingId}";
+        this.roomId = roomId + "_" + location.floorId + "_" + location.buildingId;
         this.capacity = capacity;
         this.location = location;
         this.calendar = new Calendar();
     }
 
-    public isAvailable(TimeSlot timeSlot){
+    public boolean isAvailable(TimeSlot timeSlot){
         return this.calendar.isAvailable(timeSlot);
     }
 }
@@ -107,10 +111,10 @@ class Calendar {
         this.bookings.remove(timeSlot);
     }
 
-    public boolean isAvailable (){
+    public boolean isAvailable (TimeSlot timeSlot){
         if(bookings.size()==0)return true;
         for(TimeSlot booking : this.bookings){
-            if(slot.isOverlapping(slot, booking)){
+            if(timeSlot.isOverlapping(timeSlot, booking)){
                 return true;
             }
         }
@@ -167,20 +171,20 @@ class MeetingScheduler{
     MeetingRoomController roomController;
     RoomSelectionStrategy roomSelectionStrategy;
     
-    public MeetingScheduler (MeetingRoomController roomController, RoomSelectionStrategy roomSelectionStrategy){
+    public MeetingScheduler (RoomSelectionStrategy roomSelectionStrategy, MeetingRoomController roomController){
         this.roomController = roomController;
         this.roomSelectionStrategy = roomSelectionStrategy;
     }
 
-    public void scheduleMeeting (String meetingId, String title, List<Participant> participants, TimeSlot timeSlot){
-        List<MeetingRoom> availableRooms = room/getAvailableMeetingRooms(timeSlot.startTime, time.endTime, participants.size());
+    public MeetingRoom scheduleMeeting (String meetingId, String title, List<Participant> participants, TimeSlot timeSlot){
+        List<MeetingRoom> availableRooms = roomController.getAvailableMeetingRooms(timeSlot.startTime, timeSlot.endTime, participants.size());
         MeetingRoom selectedRoom = roomSelectionStrategy.selectRoom(roomController.meetingRooms);
 
         if(selectedRoom != null){
             selectedRoom.meeting = new Meeting(meetingId, title, participants, timeSlot);
             selectedRoom.calendar.addTimeSlot(timeSlot);
-            selectedRoom.meeting.notifyParticipant("Meeting scheduled in room \{selectedRoom.roomId}");
-            System.out.println("Meeting scheduled in room \{selectedRoom.roomId}");
+            selectedRoom.meeting.notifyParticipant("Meeting scheduled in room " + selectedRoom.roomId);
+            System.out.println("Meeting scheduled in room " + selectedRoom.roomId);
 
             return selectedRoom;
         }else{
@@ -203,9 +207,9 @@ class MeetingApplication {
         roomController.addMeetingRoom(room2);
         roomController.addMeetingRoom(room3);
 
-        Participant participant1 = new Participant("ABC", "abc@gmail.com". "+0886756587");
-        Participant participant2 = new Participant("PQR", "pqr@gmail.com". "+0236876587");
-        Participant participant3 = new Participant("XYZ", "xyz@gmail.com". "+0886756337");
+        Participant participant1 = new Participant("ABC", "abc@gmail.com", "+0886756587");
+        Participant participant2 = new Participant("PQR", "pqr@gmail.com", "+0236876587");
+        Participant participant3 = new Participant("XYZ", "xyz@gmail.com", "+0886756337");
 
         List<Participant> participants = new ArrayList<>();
         participants.add(participant1);
@@ -215,4 +219,6 @@ class MeetingApplication {
         MeetingScheduler scheduler = new MeetingScheduler(new FirstComeFirstServeStrategy(), roomController);
         scheduler.scheduleMeeting("M1", "Archiving Discussion", participants, new TimeSlot(2,3));
         scheduler.scheduleMeeting("M1", "Archiving Discussion", participants, new TimeSlot(3,4));
+
+    }
 }
